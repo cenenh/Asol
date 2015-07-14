@@ -29,12 +29,10 @@ upload.get('/', function(request,response){
 upload.post('/', function(request, response) {
 	
 	//phone이랑 같이 받아서 이름을 phone번호랑 똑같이 받아서 저장....
-	
 	console.log("POST /upload is requested..");
 	//console.log(request.files.image.originalname);
 	var originalFileName = request.files.image.originalname;
 	var fileName = request.files.image.name;
-	
 	var requestFilePath = request.files.image.path;
 	//console.log("orginal name : " + originalFileName);
 	//console.log("file name : " + fileName);
@@ -45,6 +43,7 @@ upload.post('/', function(request, response) {
 		//나중에 동/호 등등...넣어서...
 		var output = [];
 		var imgDir = __dirname + "/"+".."+"/imgs/" + request.files.image.originalname;
+		var newImgDir = __dirname + "/"+".."+"/imgs/"+request.files.image.originalname;
 		console.log("imgDir : " + imgDir);
 		fs.writeFile(imgDir, data, function(error) {
 			if(error){
@@ -55,17 +54,30 @@ upload.post('/', function(request, response) {
 				console.log("Upload Fail");
 				response.send(output);
 				throw error;
-			}
+			} //if error
 			else{
-				output.push({
-					responseCode : 200,
-					responseMessage : "Upload OK"
-						
+				fs.rename(imgDir, newImgDir, function(err) {
+					if(err){ //if error
+						output.push({
+							responseCode : 400,
+							responseMessage : "Upload Fail"
+						});
+						console.log("Upload Fail");
+						response.send(output);
+						throw error;
+					}
+  					else { //non-error
+  						//save image code here
+						output.push({
+							responseCode : 200,
+							responseMessage : "Upload OK"
+						});
+
+					}
 				});
 				console.log("Upload OK");
 				response.send(output);
-				
-			}
+			} //else
 		});
 	});
 });
