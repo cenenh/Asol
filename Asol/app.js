@@ -17,5 +17,7 @@ app.use("/modify", modify);
 app.use("/upload", upload);
 
 http.createServer(app).listen(3333, function() {
+	console.log("Hello World!");
 	console.log("Asol Server Running..");
+	
 });
