@@ -1,5 +1,6 @@
 var http = require('http');
 var express = require('express');
+var session = require("express-session");
 var bodyParser = require('body-parser');
 //npm install body-parser
 var multer = require('multer');
@@ -9,6 +10,7 @@ var mysql = require('mysql');
 var crypto = require("crypto");
 //npm install crypto
 
+
 var login = express();
 
 login.use(bodyParser.json()); // for parsing application/json
@@ -17,6 +19,8 @@ login.use(bodyParser.urlencoded({
 })); // for parsing application/x-www-form-urlencoded
 login.use(multer()); // for parsing multipart/form-data
 login.use(express.Router());
+login.use(session({secret : "AsolAsolAsol"}));
+
 
 login.use(function(request, response, next) {
 	console.log("/login middleware...");
