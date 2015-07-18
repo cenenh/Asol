@@ -1,15 +1,11 @@
 var http = require('http');
 var express = require('express');
-var session = require("express-session");
 var bodyParser = require('body-parser');
-//npm install body-parser
 var multer = require('multer');
-//npm install multer
 var mysql = require('mysql');
-//npm install mysql
 var crypto = require("crypto");
-//npm install crypto
-
+var cookieParser = require('cookie-parser'); 
+var expressSession = require('express-session');
 
 var login = express();
 
@@ -19,7 +15,7 @@ login.use(bodyParser.urlencoded({
 })); // for parsing application/x-www-form-urlencoded
 login.use(multer()); // for parsing multipart/form-data
 login.use(express.Router());
-login.use(session({secret : "AsolAsolAsol"}));
+login.use(expressSession({secret:'AsolAsolAsol'}));
 
 
 login.use(function(request, response, next) {
@@ -39,6 +35,7 @@ login.get('/', function(request, response){
 });
 
 login.post('/', function(request, response) {
+	
 	console.log("/login is requested..");
 	var body = request.body;
 	var key = "asol";
@@ -74,10 +71,12 @@ login.post('/', function(request, response) {
 		if (err) { //DB error
 			console.log(err);
 			var failResult = [];
-			failResult.push({
-				responseCode : 500, //internal error 
-				responseMessage : "Server Internal Error"
-			});
+			failResult.push(
+					{
+						responseCode : 500, //internal error 
+						responseMessage : "Server Internal Error"
+					}
+				);
 			response.send(failResult);
 			console.log("/login result : " + JSON.stringify(failResult));
 		} else { // No error
@@ -87,20 +86,26 @@ login.post('/', function(request, response) {
 			userInfo.push(result);
 			//
 			if (result.length > 0) {
-				successResult.push({
-					responseCode : 200,
-					responseMessage : "LoginSuccess",
-					responseUserInfo : userInfo
-				});
+				successResult.push(
+						{
+							responseCode : 200,
+							responseMessage : "LoginSuccess",
+							responseUserInfo : userInfo
+						}
+				);
+				request.session.userInfo = result[0]; //session에 저장.
 			} else if (result.length === 0) {
-				successResult.push({
-					responseCode : 400,
-					responseMessage : "LoginFail"
-				});
+				successResult.push(
+						{
+							responseCode : 400,
+							responseMessage : "LoginFail"
+						}
+				);
 			}
 			response.send(successResult);
 			//response.send(result);
 			console.log("/login result : " + JSON.stringify(successResult));
+			console.log(request.session.userInfo);
 		}
 	}); //Insert
 });
