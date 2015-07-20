@@ -26,11 +26,21 @@ login.use(function(request, response, next) {
 //get 요청시 error 
 login.get('/', function(request, response){
 	console.log("GET /login is called..");
-	var output = [];
-	output.push({
-		responseCode : 200,
-		responseMessage : "REQUEST /login using POST Method."
-	});
+	var output = {};
+	if(request.session){
+		output = {
+			responseCode : 200,
+			responseMessage : "the session exists",
+			userName : request.session.userInfo.name,
+			userPhone : request.session.userInfo.phone,
+		};
+	}
+	else{
+		output = {
+				responseCode : 400,
+				responseMessage : "Re-login with POST /login"
+		};
+	}	
 	response.send(output);
 });
 
@@ -49,7 +59,7 @@ login.post('/', function(request, response) {
 		phone : body.phone,
 		pw : encryptedPassword
 	};
-
+	
 	var dbConnection = mysql.createConnection({
 		host : 'localhost',
 		port : 3306,
@@ -84,7 +94,6 @@ login.post('/', function(request, response) {
 			var successResult = [];
 			var userInfo = [];
 			userInfo.push(result);
-			//
 			if (result.length > 0) {
 				successResult.push(
 						{
@@ -94,6 +103,7 @@ login.post('/', function(request, response) {
 						}
 				);
 				request.session.userInfo = result[0]; //session에 저장.
+				console.log(request.session.userInfo);
 			} else if (result.length === 0) {
 				successResult.push(
 						{
@@ -105,6 +115,7 @@ login.post('/', function(request, response) {
 			response.send(successResult);
 			//response.send(result);
 			console.log("/login result : " + JSON.stringify(successResult));
+			console.log("session stored");
 			console.log(request.session.userInfo);
 		}
 	}); //Insert
