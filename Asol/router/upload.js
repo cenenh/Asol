@@ -24,62 +24,74 @@ upload.get('/', function(request,response){
 	console.log("GET /upload is requested..");
 	var filePath = __dirname + "\\image";
 	console.log("filePath = "+filePath);
+	var output = [];
+	output.push(
+			{
+				responseCode : 400,
+				responseMessage : "access using POST /upload"
+			}
+	);
+	response.send(output);
+	
 });
 
 upload.post('/', function(request, response) {
 	
-	//phone이랑 같이 받아서 이름을 phone번호랑 똑같이 받아서 저장....
 	console.log("POST /upload is requested..");
 	//console.log(request.files.image.originalname);
-	var originalFileName = request.files.image.originalname;
-	var fileName = request.files.image.name;
-	var requestFilePath = request.files.image.path;
 	//console.log("orginal name : " + originalFileName);
 	//console.log("file name : " + fileName);
 	//console.log("requestFilePath : " + requestFilePath);
 	//console.log("Received File : \n"+JSON.stringify(request.files));
-	
-	fs.readFile(request.files.image.path, function(err, data) {
-		//나중에 동/호 등등...넣어서...
-		var output = [];
-		var imgDir = __dirname + "/"+".."+"/imgs/" + request.files.image.originalname;
-		var newImgDir = __dirname + "/"+".."+"/imgs/"+request.files.image.originalname;
-		console.log("imgDir : " + imgDir);
-		fs.writeFile(imgDir, data, function(error) {
-			if(error){
-				output.push({
-					responseCode : 400,
-					responseMessage : "Upload Fail"
+	if(request.session){
+		
+		var originalFileName = request.files.image.originalname;
+		var fileName = request.files.image.name;
+		var requestFilePath = request.files.image.path;
+		fs.readFile(request.files.image.path, function(err, data) {
+			//나중에 동/호 등등...넣어서...
+			if (!err) 
+			{
+				var output = [];
+				var imgDir = __dirname + "/" + ".." + "/imgs/" + request.files.image.originalname;
+				var newFileName = "asol_"+ request.session.userInfo.unum+"_"+ request.session.userInfo.phone.substring(9);
+				var newImgDir = __dirname + "/" + ".." + "/imgs/"+ newFileName;
+				console.log("will saved at : " + newImgDir);
+				fs.rename(imgDir, newImgDir, function(error) {
+						if (!error){
+							output.push(
+									{
+										responseCode : 200,
+										responseMessage : "Upload Success"
+									}
+							);
+						}
 				});
-				console.log("Upload Fail");
-				response.send(output);
-				throw error;
-			} //if error
-			else{
-				fs.rename(imgDir, newImgDir, function(err) {
-					if(err){ //if error
-						output.push({
+			}
+			else {
+				var output2=[];
+				output2.push(
+						{
 							responseCode : 400,
 							responseMessage : "Upload Fail"
-						});
-						console.log("Upload Fail");
-						response.send(output);
-						throw error;
-					}
-  					else { //non-error
-  						//save image code here
-						output.push({
-							responseCode : 200,
-							responseMessage : "Upload OK"
-						});
-
-					}
-				});
-				console.log("Upload OK");
-				response.send(output);
-			} //else
+						}
+				);
+				response.send(output2);
+			}
+			
 		});
-	});
+	}
+	else{
+		var output = [];
+		output.push(
+				{
+					responseCode : 400,
+					responseMessage : "Need to re-login"
+				}
+		);
+		response.send(output);
+	}
+	
 });
 
 module.exports = upload;
