@@ -5,7 +5,7 @@ var multer = require('multer');
 var mysql = require('mysql');
 var crypto = require("crypto");
 var cookieParser = require('cookie-parser'); 
-var expressSession = require('express-session');
+var session = require('express-session');
 
 var login = express();
 
@@ -15,7 +15,17 @@ login.use(bodyParser.urlencoded({
 })); // for parsing application/x-www-form-urlencoded
 login.use(multer()); // for parsing multipart/form-data
 login.use(express.Router());
-login.use(expressSession({secret:'AsolAsolAsol'}));
+login.use(cookieParser());
+login.use(session({
+	key: 'asol_key',
+	secret: 'asol',
+	resave: false,
+	saveUninitialized: true,
+	userInfo:[],
+	cookie: {
+		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
+	}
+}));
 
 
 login.use(function(request, response, next) {
@@ -27,12 +37,13 @@ login.use(function(request, response, next) {
 login.get('/', function(request, response){
 	console.log("GET /login is called..");
 	var output = {};
-	if(request.session){
+	if(request.session !== undefined){
 		output = {
 			responseCode : 200,
 			responseMessage : "the session exists",
 			userName : request.session.userInfo.name,
 			userPhone : request.session.userInfo.phone,
+			sessionID : request.session.id
 		};
 	}
 	else{
@@ -119,5 +130,6 @@ login.post('/', function(request, response) {
 			console.log(request.session.userInfo);
 		}
 	}); //Insert
+	dbConnection.end(); //Release DB Connection
 });
 module.exports = login;

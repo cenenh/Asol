@@ -2,21 +2,33 @@ var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-//npm install multer
 var mysql = require('mysql');
-//npm install mysql
 var fs = require('fs');
-var parent = require('parentpath');
-
+var cookieParser = require('cookie-parser'); 
+var session = require('express-session');
+		
 var upload = express();
 
 upload.use(bodyParser.json()); // for parsing application/json
 upload.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 upload.use(multer()); // for parsing multipart/form-data
 upload.use(express.Router());
+upload.use(cookieParser());
+upload.use(session({
+	key: 'asol_key',
+	secret: 'asol',
+	resave: false,
+	saveUninitialized: true,
+	userInfo:[],
+	cookie: {
+		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
+	}
+}));
 
 upload.use(function(request, response, next) {
 	console.log("/upload middleware..");
+	var session = request.session;
+	console.log(session);
 	next();
 });
 
@@ -43,13 +55,13 @@ upload.post('/', function(request, response) {
 	//console.log("file name : " + fileName);
 	//console.log("requestFilePath : " + requestFilePath);
 	//console.log("Received File : \n"+JSON.stringify(request.files));
-	if(request.session){
-		
+	if(request.session !== undefined){
 		var originalFileName = request.files.image.originalname;
 		var fileName = request.files.image.name;
 		var requestFilePath = request.files.image.path;
+		console.log("hi!");
+		console.log(request.session.userInfo);
 		fs.readFile(request.files.image.path, function(err, data) {
-			//나중에 동/호 등등...넣어서...
 			if (!err) 
 			{
 				var output = [];
