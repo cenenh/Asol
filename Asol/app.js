@@ -6,18 +6,34 @@ var join = require("./router/join");
 var login = require("./router/login");
 var modify = require("./router/modify");
 var upload = require("./router/upload");
-
+var cookieParser = require('cookie-parser'); 
+var session = require('express-session');
 
 var app = express();
 
-
+app.use(cookieParser());
+app.use(session({
+	key: 'asol_key',
+	secret: 'asol',
+	resave: false,
+	saveUninitialized: true,
+	userInfo:[],
+	cookie: {
+		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
+	}
+}));
 app.use(express.static(__dirname+'/static'));
-
-app.use("/static/test_login.html", function (request,response) {
+app.use("/static/login", function (request,response) {
 	fs.readFile('./static/test_login.html', function(err, data) {
 		response.send(data.toString());
 	});
 });
+app.use("/static/upload", function (request,response) {
+	fs.readFile('./static/test_upload.html', function(err, data) {
+		response.send(data.toString());
+	});
+});
+
 
 app.use("/ping" , ping);
 app.use("/join" , join);
