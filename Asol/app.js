@@ -8,8 +8,11 @@ var modify = require("./router/modify");
 var upload = require("./router/upload");
 var cookieParser = require('cookie-parser'); 
 var session = require('express-session');
+var net = require('net');
 
 var app = express();
+var socket_server = require('net').createServer();
+
 
 app.use(cookieParser());
 app.use(session({
@@ -22,6 +25,7 @@ app.use(session({
 		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
 	}
 }));
+
 app.use(express.static(__dirname+'/static'));
 app.use("/static/login", function (request,response) {
 	fs.readFile('./static/test_login.html', function(err, data) {
@@ -43,6 +47,6 @@ app.use("/upload", upload);
 
 http.createServer(app).listen(3333, function() {
 	console.log("Hello World!");
-	console.log("Asol Server Running..");
-	
+	console.log("Asol Server Running in port : 3333..");
 });
+
