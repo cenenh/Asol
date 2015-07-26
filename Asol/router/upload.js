@@ -4,10 +4,13 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var mysql = require('mysql');
 var fs = require('fs');
-var cookieParser = require('cookie-parser'); 
+var cookieParser = require('cookie-parser');
 var session = require('express-session');
-		
+var path = require('path');
+
 var upload = express();
+var imageDir = path.join(__dirname,'../imgs/');
+
 
 upload.use(bodyParser.json()); // for parsing application/json
 upload.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -37,33 +40,42 @@ upload.get('/', function(request,response){
 	var filePath = __dirname + "\\image";
 	console.log("filePath = "+filePath);
 	var output = [];
-	output.push(
-			{
-				responseCode : 400,
-				responseMessage : "access using POST /upload"
-			}
-	);
+	output.push({
+		responseCode : 400,
+		responseMessage : "access using POST /upload"
+	});
 	response.send(output);
-	
 });
 
 upload.post('/', function(request, response) {
-	
 	console.log("POST /upload is requested..");
 
-	if(request.session !== undefined){
+	fs.exists(imageDir,function(exists){
+		if(exists){
+			console.log(imageDir + ' is exists..');
+		}
+		else {
+			console.log('i will mkdir()');
+			fs.mkdir(imageDir, 0666, function(error){
+				if(error){
+					console.log('mkdir() error');
+					throw error;
+				}
+			});
+		}
+	});
+
+	if(request.session !== undefined || request.session !== null){
 
 		/*
-		 * {"image":{"fieldname":"image","originalname":"naver_email2.png","name":"856948828b99934e2ac9471891fb0bca.png",
-		 * "encoding":"7bit","mimetype":"image/png","path":"C:\\Users\\EunHo\\AppData\\Local\\Temp\\856948828b99934e2ac9471891fb0bca.png",
+		 * {"image":{"fieldname":"image","originalname":"naver_email2.png","name":"856948828b99934e.png",
+		 * "encoding":"7bit","mimetype":"image/png","path":"",
 		 * "extension":"png","size":17022,"truncated":false,"buffer":null}}
-		 * 
-		 * 
 		 * */
-			
+
 		fs.readFile(request.files.image.path, function(err, data) {
-			if (!err) 
-			{	
+			if (!err)
+			{
 				var session = request.session.userInfo;
 				var originalFileName = request.files.image.originalname;
 				var fileExtension = request.files.image.extension;
@@ -71,13 +83,14 @@ upload.post('/', function(request, response) {
 				console.log("orginal name : " + originalFileName);
 				console.log("Received File Extension : " + fileExtension);
 				var output = [];
-				var imgDir = __dirname + "/" + ".." + "/imgs/" + request.files.image.originalname;
+				//__dirname + "/" + ".." + "/imgs/"
+				var imgDir = imageDir + request.files.image.originalname;
 				var newFileName = "asol_"+ session.unum + "_" + session.dong + "_" + session.ho + "_" + session.phone.substring(9) + "." + fileExtension;
-				var newImgDir = __dirname + "/" + ".." + "/imgs/"+ newFileName;
-				console.log("will saved at : " + newImgDir);
-				
+				var newImgDir = imageDir + newFileName;
+				console.log("it will be saved at : " + newImgDir);
+
 				fs.writeFile(imgDir, data, function(err) {
-					console.log("wirte file!" + newFileName);
+					console.log("Write File! " + newFileName);
 					if(!err){
 						fs.rename(imgDir, newImgDir, function(err) {
 							if(!err){
@@ -86,12 +99,12 @@ upload.post('/', function(request, response) {
 									responseMessage : "Upload OK!",
 									imageFileName : newFileName
 								});
-								response.send(output);	
+								response.send(output);
 							}
 							else{
 								output.push({
 									responseCode : 400,
-									responseMessage : "Upload Fail"
+									responseMessage : "Upload(File-Rename) Fail"
 								});
 								response.send(output);
 							}
@@ -100,7 +113,7 @@ upload.post('/', function(request, response) {
 					else{
 						output.push({
 							responseCode : 400,
-							responseMessage : "Upload Fail"
+							responseMessage : "Upload(WriteFile in Server) Fail"
 						});
 						response.send(output);
 					}
@@ -109,8 +122,8 @@ upload.post('/', function(request, response) {
 			else {
 				var output2=[];
 				output2.push({
-							responseCode : 400,
-							responseMessage : "Upload Fail"
+					responseCode : 400,
+					responseMessage : "Upload(ReadFile in Server) Fail"
 				});
 				response.send(output2);
 			}
@@ -119,12 +132,11 @@ upload.post('/', function(request, response) {
 	else{
 		var output = [];
 		output.push({
-					responseCode : 400,
-					responseMessage : "Need to re-login"
+			responseCode : 400,
+			responseMessage : "Need to re-login"
 		});
 		response.send(output);
 	}
-	
 });
 
 module.exports = upload;

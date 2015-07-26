@@ -32,18 +32,18 @@ join.post('/' , function (request,response){
 	// dong : apartment dong
 	// ho : apartment ho
 	// pw : user password
-	
+
 	var key = "asol";
 	var cipher = crypto.createCipher("aes128", key);
 	var encryptedPassword = cipher.update(body.password,"utf-8","hex");
 	encryptedPassword += cipher.final("hex");
 	//console.log("EncryptedPassword : "+encryptedPassword);
-	
+
 	//var decipher = crypto.createDecipher("aes128", key);
 	//var decryptedPassword = decipher.update(encryptedPassword, "hex", "utf-8");
-	//decryptedPassword += decipher.final("utf-8");  
+	//decryptedPassword += decipher.final("utf-8");
 	//console.log("DecryptedPassword : "+decryptedPassword);
-	
+
 	var user = {
 			name : body.name,
 			phone : body.phone,
@@ -52,31 +52,31 @@ join.post('/' , function (request,response){
 			//pw : body.password
 			pw : encryptedPassword
 	}; //request로 받아온 user information 따와서 저장.
-	
+
 	var dbConnection = mysql.createConnection({
 	    host : 'localhost',
 	    port : 3306,
 	    user : 'root',
 	    password : 'chldbwls',
 	    database:'asol_local'
-	}); // Create DataBase Connection 
-	
+	}); // Create DataBase Connection
+
 	dbConnection.connect(function(err) {
-		if (err) 
+		if (err)
 		{
 			console.log("DB Connectio Error");
 			console.log(err);
 		}
 	}); // DataBase Connection Test
-	console.log("/join requested User Information : " +  JSON.stringify(user));	
+	console.log("/join requested User Information : " +  JSON.stringify(user));
 	var query = dbConnection.query("insert into USER set ?", user, function(err,result){
-		
+
 		if(err){ //error
 			var failResult = [];
-			
+
 			console.log(err);
 			//console.log(err.toString().toLowerCase());
-			
+
 			if(err.toString().toLowerCase().match("phone_unique")){ //phone넘버 중복
 				failResult.push({
 					responseCode : 400,
@@ -103,7 +103,7 @@ join.post('/' , function (request,response){
 			console.log("/join result : " + JSON.stringify(successResult));
 		}
 	}); //Insert
-	
+
 	dbConnection.end(); //Release DB Connection
 });
 

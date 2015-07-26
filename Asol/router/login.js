@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var mysql = require('mysql');
 var crypto = require("crypto");
-var cookieParser = require('cookie-parser'); 
+var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
 var login = express();
@@ -33,7 +33,7 @@ login.use(function(request, response, next) {
 	next();
 });
 
-//get 요청시 error 
+//get 요청시 error
 login.get('/', function(request, response){
 	console.log("GET /login is called..");
 	var output = {};
@@ -51,16 +51,16 @@ login.get('/', function(request, response){
 				responseCode : 400,
 				responseMessage : "Re-login with POST /login"
 		};
-	}	
+	}
 	response.send(output);
 });
 
 login.post('/', function(request, response) {
-	
+
 	console.log("/login is requested..");
 	var body = request.body;
 	var key = "asol";
-	
+
 	//암호화
 	var cipher = crypto.createCipher("aes128", key);
 	var encryptedPassword = cipher.update(body.password, "utf-8", "hex");
@@ -70,14 +70,14 @@ login.post('/', function(request, response) {
 		phone : body.phone,
 		pw : encryptedPassword
 	};
-	
+
 	var dbConnection = mysql.createConnection({
 		host : 'localhost',
 		port : 3306,
 		user : 'root',
 		password : 'chldbwls',
 		database : 'asol_local'
-	}); // Create DataBase Connection 
+	}); // Create DataBase Connection
 
 	dbConnection.connect(function(err) {
 		if (err) {
@@ -94,7 +94,7 @@ login.post('/', function(request, response) {
 			var failResult = [];
 			failResult.push(
 					{
-						responseCode : 500, //internal error 
+						responseCode : 500, //internal error
 						responseMessage : "Server Internal Error"
 					}
 				);
