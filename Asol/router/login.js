@@ -15,13 +15,12 @@ login.use(bodyParser.urlencoded({
 })); // for parsing application/x-www-form-urlencoded
 login.use(multer()); // for parsing multipart/form-data
 login.use(express.Router());
-login.use(cookieParser());
+login.use(cookieParser('asol'));
 login.use(session({
 	key: 'asol_key',
 	secret: 'asol',
 	resave: false,
 	saveUninitialized: true,
-	userInfo:[],
 	cookie: {
 		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
 	}
@@ -35,7 +34,7 @@ login.use(function(request, response, next) {
 //get 요청시 error
 login.get('/', function(request, response){
 	console.log("GET /login is called..");
-	var output = {};
+	var output = [];
 	if(request.session !== undefined){
 		output = {
 			responseCode : 200,
@@ -99,6 +98,7 @@ login.post('/', function(request, response) {
 						}
 				);
 				request.session.userInfo = result[0]; //session에 저장.
+				request.session.save();
 				console.log(request.session.userInfo);
 			} else if (result.length === 0) {
 				successResult.push(

@@ -16,13 +16,12 @@ upload.use(bodyParser.json()); // for parsing application/json
 upload.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 upload.use(multer()); // for parsing multipart/form-data
 upload.use(express.Router());
-upload.use(cookieParser());
+upload.use(cookieParser('asol'));
 upload.use(session({
 	key: 'asol_key',
 	secret: 'asol',
 	resave: false,
 	saveUninitialized: true,
-	userInfo:[],
 	cookie: {
 		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
 	}
@@ -49,7 +48,6 @@ upload.get('/', function(request,response){
 
 upload.post('/', function(request, response) {
 	console.log("POST /upload is requested..");
-
 	fs.exists(imageDir,function(exists){
 		if(exists){
 			console.log(imageDir + ' is exists..');
@@ -64,9 +62,8 @@ upload.post('/', function(request, response) {
 			});
 		}
 	});
-
+	var session = request.session.userInfo;
 	if(request.session !== undefined || request.session !== null){
-
 		/*
 		 * {"image":{"fieldname":"image","originalname":"naver_email2.png","name":"856948828b99934e.png",
 		 * "encoding":"7bit","mimetype":"image/png","path":"",
@@ -75,7 +72,6 @@ upload.post('/', function(request, response) {
 		fs.readFile(request.files.image.path, function(err, data) {
 			if (!err)
 			{
-				var session = request.session.userInfo;
 				var originalFileName = request.files.image.originalname;
 				var fileExtension = request.files.image.extension;
 				console.log(request.session.userInfo);

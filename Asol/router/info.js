@@ -14,7 +14,7 @@ var imageDir = path.join(__dirname, '../imgs/');
 
 info.use(multer()); // for parsing multipart/form-data
 info.use(express.Router());
-info.use(cookieParser());
+info.use(cookieParser('asol'));
 info.use(session({
 	key: 'asol_key',
 	secret: 'asol',
@@ -36,7 +36,7 @@ function do_response(request, response){
 	var user_dong = session.dong;
 	var user_ho = session.ho;
 	var dbConnection = database();
-	var query = dbConnection.query("select ")
+	var query = dbConnection.query("select unum, name, ")
 }
 
 info.get('/', function(request, response){

@@ -12,13 +12,12 @@ var session = require('express-session');
 
 var app = express();
 
-app.use(cookieParser());
+app.use(cookieParser('asol'));
 app.use(session({
 	key: 'asol_key',
 	secret: 'asol',
 	resave: false,
 	saveUninitialized: true,
-	userInfo:[],
 	cookie: {
 		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
 	}
@@ -41,14 +40,23 @@ app.use("/static/join", function (request,response) {
 	});
 });
 
-
-
 app.use("/ping" , ping);
 app.use("/join" , join);
 app.use("/login", login);
 app.use("/modify", modify);
 app.use("/upload", upload);
 app.use("/info", info);
+
+exports.writesession = function(req, res){
+  req.session.name='terry';
+  console.log('write session = name:'+req.session.name);
+  res.end();
+};
+
+exports.readsession = function(req, res){
+	console.log('write session = name:'+req.session.name);
+  res.end();
+};
 
 http.createServer(app).listen(3333, function() {
 	console.log("Hello World!");
