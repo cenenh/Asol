@@ -6,7 +6,7 @@ var mysql = require('mysql');
 var crypto = require("crypto");
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-
+var database = require('../util/asol_db');
 var login = express();
 
 login.use(bodyParser.json()); // for parsing application/json
@@ -26,7 +26,6 @@ login.use(session({
 		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
 	}
 }));
-
 
 login.use(function(request, response, next) {
 	console.log("/login middleware...");
@@ -61,7 +60,7 @@ login.post('/', function(request, response) {
 	var body = request.body;
 	var key = "asol";
 
-	//암호화
+	//encryption
 	var cipher = crypto.createCipher("aes128", key);
 	var encryptedPassword = cipher.update(body.password, "utf-8", "hex");
 	encryptedPassword += cipher.final("hex");
@@ -71,22 +70,8 @@ login.post('/', function(request, response) {
 		pw : encryptedPassword
 	};
 
-	var dbConnection = mysql.createConnection({
-		host : 'localhost',
-		port : 3306,
-		user : 'root',
-		password : 'chldbwls',
-		database : 'asol_local'
-	}); // Create DataBase Connection
-
-	dbConnection.connect(function(err) {
-		if (err) {
-			console.log("DB Connectio Error");
-			console.log(err);
-		}
-	}); // DataBase Connection Test
 	console.log("/login requested User Information : " + JSON.stringify(user));
-
+	var dbConnection = database()
 	var query = dbConnection.query("select * from USER where phone = "+ mysql.escape(body.phone) + " and pw=  "+ mysql.escape(encryptedPassword), function(err, result) {
 
 		if (err) { //DB error

@@ -72,7 +72,6 @@ upload.post('/', function(request, response) {
 		 * "encoding":"7bit","mimetype":"image/png","path":"",
 		 * "extension":"png","size":17022,"truncated":false,"buffer":null}}
 		 * */
-
 		fs.readFile(request.files.image.path, function(err, data) {
 			if (!err)
 			{
@@ -85,7 +84,7 @@ upload.post('/', function(request, response) {
 				var output = [];
 				//__dirname + "/" + ".." + "/imgs/"
 				var imgDir = imageDir + request.files.image.originalname;
-				var newFileName = "asol_"+ session.unum + "_" + session.dong + "_" + session.ho + "_" + session.phone.substring(9) + "." + fileExtension;
+				var newFileName = "asol_"+ session.unum + "#" + session.dong + "#" + session.ho + "#" + session.phone.substring(9) + "." + fileExtension;
 				var newImgDir = imageDir + newFileName;
 				console.log("it will be saved at : " + newImgDir);
 

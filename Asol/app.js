@@ -6,13 +6,11 @@ var join = require("./router/join");
 var login = require("./router/login");
 var modify = require("./router/modify");
 var upload = require("./router/upload");
-var cookieParser = require('cookie-parser'); 
+var info = require("./router/info");
+var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var net = require('net');
 
 var app = express();
-var socket_server = require('net').createServer();
-
 
 app.use(cookieParser());
 app.use(session({
@@ -37,6 +35,12 @@ app.use("/static/upload", function (request,response) {
 		response.send(data.toString());
 	});
 });
+app.use("/static/join", function (request,response) {
+	fs.readFile('./static/test_join.html', function(err, data) {
+		response.send(data.toString());
+	});
+});
+
 
 
 app.use("/ping" , ping);
@@ -44,9 +48,9 @@ app.use("/join" , join);
 app.use("/login", login);
 app.use("/modify", modify);
 app.use("/upload", upload);
+app.use("/info", info);
 
 http.createServer(app).listen(3333, function() {
 	console.log("Hello World!");
 	console.log("Asol Server Running in port : 3333..");
 });
-
