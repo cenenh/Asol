@@ -18,7 +18,6 @@ login.use(express.Router());
 login.use(cookieParser('asol'));
 login.use(session({
 	key: 'asol_key',
-	secret: 'asol',
 	resave: false,
 	saveUninitialized: true,
 	cookie: {
@@ -35,26 +34,14 @@ login.use(function(request, response, next) {
 login.get('/', function(request, response){
 	console.log("GET /login is called..");
 	var output = [];
-	if(request.session !== undefined){
-		output = {
-			responseCode : 200,
-			responseMessage : "the session exists",
-			userName : request.session.userInfo.name,
-			userPhone : request.session.userInfo.phone,
-			sessionID : request.session.id
-		};
-	}
-	else{
-		output = {
-				responseCode : 400,
-				responseMessage : "Re-login with POST /login"
-		};
-	}
+	output = {
+			responseCode : 400,
+			responseMessage : "Re-login with POST /login"
+	};
 	response.send(output);
 });
 
 login.post('/', function(request, response) {
-
 	console.log("/login is requested..");
 	var body = request.body;
 	var key = "asol";
@@ -81,14 +68,16 @@ login.post('/', function(request, response) {
 						responseCode : 500, //internal error
 						responseMessage : "Server Internal Error"
 					}
-				);
+			);
 			response.send(failResult);
 			console.log("/login result : " + JSON.stringify(failResult));
-		} else { // No error
+		}
+		else { // No error
 			console.log(result);
 			var successResult = [];
 			var userInfo = [];
 			userInfo.push(result);
+
 			if (result.length > 0) {
 				successResult.push(
 						{
@@ -97,10 +86,8 @@ login.post('/', function(request, response) {
 							responseUserInfo : userInfo
 						}
 				);
-				request.session.userInfo = result[0]; //session에 저장.
-				request.session.save();
-				console.log(request.session.userInfo);
-			} else if (result.length === 0) {
+			}
+			else if (result.length === 0) {
 				successResult.push(
 						{
 							responseCode : 400,
@@ -111,8 +98,6 @@ login.post('/', function(request, response) {
 			response.send(successResult);
 			//response.send(result);
 			console.log("/login result : " + JSON.stringify(successResult));
-			console.log("session stored");
-			console.log(request.session.userInfo);
 		}
 	}); //Insert
 	dbConnection.end(); //Release DB Connection

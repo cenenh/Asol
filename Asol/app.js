@@ -29,11 +29,13 @@ app.use("/static/login", function (request,response) {
 		response.send(data.toString());
 	});
 });
+
 app.use("/static/upload", function (request,response) {
 	fs.readFile('./static/test_upload.html', function(err, data) {
 		response.send(data.toString());
 	});
 });
+
 app.use("/static/join", function (request,response) {
 	fs.readFile('./static/test_join.html', function(err, data) {
 		response.send(data.toString());
@@ -46,17 +48,6 @@ app.use("/login", login);
 app.use("/modify", modify);
 app.use("/upload", upload);
 app.use("/info", info);
-
-exports.writesession = function(req, res){
-  req.session.name='terry';
-  console.log('write session = name:'+req.session.name);
-  res.end();
-};
-
-exports.readsession = function(req, res){
-	console.log('write session = name:'+req.session.name);
-  res.end();
-};
 
 http.createServer(app).listen(3333, function() {
 	console.log("Hello World!");

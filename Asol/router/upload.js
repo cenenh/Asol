@@ -29,8 +29,6 @@ upload.use(session({
 
 upload.use(function(request, response, next) {
 	console.log("/upload middleware..");
-	var session = request.session;
-	console.log(session);
 	next();
 });
 
@@ -62,76 +60,66 @@ upload.post('/', function(request, response) {
 			});
 		}
 	});
-	var session = request.session.userInfo;
-	if(request.session !== undefined || request.session !== null){
-		/*
-		 * {"image":{"fieldname":"image","originalname":"naver_email2.png","name":"856948828b99934e.png",
-		 * "encoding":"7bit","mimetype":"image/png","path":"",
-		 * "extension":"png","size":17022,"truncated":false,"buffer":null}}
-		 * */
-		fs.readFile(request.files.image.path, function(err, data) {
-			if (!err)
-			{
-				var originalFileName = request.files.image.originalname;
-				var fileExtension = request.files.image.extension;
-				console.log(request.session.userInfo);
-				console.log("orginal name : " + originalFileName);
-				console.log("Received File Extension : " + fileExtension);
-				var output = [];
-				//__dirname + "/" + ".." + "/imgs/"
-				var imgDir = imageDir + request.files.image.originalname;
-				var newFileName = "asol_"+ session.unum + "#" + session.dong + "#" + session.ho + "#" + session.phone.substring(9) + "." + fileExtension;
-				var newImgDir = imageDir + newFileName;
-				console.log("it will be saved at : " + newImgDir);
+	var body = request.body;
+	var user = {
+		unum: body.unum,
+		phone: body.phone,
+		dong: body.dong,
+		ho: body.ho
+	};
 
-				fs.writeFile(imgDir, data, function(err) {
-					console.log("Write File! " + newFileName);
-					if(!err){
-						fs.rename(imgDir, newImgDir, function(err) {
-							if(!err){
-								output.push({
-									responseCode : 200,
-									responseMessage : "Upload OK!",
-									imageFileName : newFileName
-								});
-								response.send(output);
-							}
-							else{
-								output.push({
-									responseCode : 400,
-									responseMessage : "Upload(File-Rename) Fail"
-								});
-								response.send(output);
-							}
-						});
-					}
-					else{
-						output.push({
-							responseCode : 400,
-							responseMessage : "Upload(WriteFile in Server) Fail"
-						});
-						response.send(output);
-					}
-				});
-			}
-			else {
-				var output2=[];
-				output2.push({
-					responseCode : 400,
-					responseMessage : "Upload(ReadFile in Server) Fail"
-				});
-				response.send(output2);
-			}
-		});
-	}
-	else{
-		var output = [];
-		output.push({
-			responseCode : 400,
-			responseMessage : "Need to re-login"
-		});
-		response.send(output);
-	}
+	fs.readFile(request.files.image.path, function(err, data){
+		if (!err)
+		{
+			var originalFileName = request.files.image.originalname;
+			var fileExtension = request.files.image.extension;
+			console.log("orginal name : " + originalFileName);
+			console.log("Received File Extension : " + fileExtension);
+			var output = [];
+			//__dirname + "/" + ".." + "/imgs/"
+			var imgDir = imageDir + request.files.image.originalname;
+			var newFileName = "asol_"+ user.unum + "_" + user.dong + "_" + user.ho + "_" + user.phone.substring(7) + "." + fileExtension;
+			var newImgDir = imageDir + newFileName;
+			console.log("it will be saved at : " + newImgDir);
+
+			fs.writeFile(imgDir, data, function(err) {
+				console.log("Write File! " + newFileName);
+				if(!err){
+					fs.rename(imgDir, newImgDir, function(err) {
+						if(!err){
+							output.push({
+								responseCode : 200,
+								responseMessage : "Upload OK!",
+								imageFileName : newFileName
+							});
+							response.send(output);
+						}
+						else{
+							output.push({
+								responseCode : 400,
+								responseMessage : "Upload(File-Rename) Fail"
+							});
+							response.send(output);
+						}
+					});
+				}
+				else{
+					output.push({
+						responseCode : 400,
+						responseMessage : "Upload(WriteFile in Server) Fail"
+					});
+					response.send(output);
+				}
+			});
+		}
+		else {
+			var output2=[];
+			output2.push({
+				responseCode : 400,
+				responseMessage : "Upload(ReadFile in Server) Fail"
+			});
+			response.send(output2);
+		}
+	});
 });
-
 module.exports = upload;
