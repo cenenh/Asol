@@ -11,21 +11,11 @@ var path = require('path');
 var upload = express();
 var imageDir = path.join(__dirname,'../imgs/');
 
-
 upload.use(bodyParser.json()); // for parsing application/json
 upload.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 upload.use(multer()); // for parsing multipart/form-data
 upload.use(express.Router());
-upload.use(cookieParser('asol'));
-upload.use(session({
-	key: 'asol_key',
-	secret: 'asol',
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
-	}
-}));
+
 
 upload.use(function(request, response, next) {
 	console.log("/upload middleware..");

@@ -12,7 +12,7 @@ modify.use(bodyParser.json()); // for parsing application/json
 modify.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 modify.use(multer()); // for parsing multipart/form-data
 modify.use(express.Router());
-modify.use(cookieParser('asol'));
+
 
 modify.use(function(request, response, next) {
 	console.log("/modify middleware");

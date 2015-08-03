@@ -14,27 +14,18 @@ var imageDir = path.join(__dirname, '../imgs/');
 
 info.use(multer()); // for parsing multipart/form-data
 info.use(express.Router());
-info.use(cookieParser('asol'));
-
 
 info.use(function(request, response, next) {
 	console.log("/info middleware...");
 	next();
 });
 
-function do_response(request, response){
-	var session = request.session.userInfo;
-	var user_dong = session.dong;
-	var user_ho = session.ho;
-	//var dbConnection = database();
-}
-
 info.get('/', function(request, response){
-	do_response(request, response);
+	response.send("GET info")
 });
 
 info.post('/', function(request, response){
-	do_response(request, response);
+	response.send("POST info")
 });
 
 module.exports = info;

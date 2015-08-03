@@ -12,16 +12,6 @@ var session = require('express-session');
 
 var app = express();
 
-app.use(cookieParser('asol'));
-app.use(session({
-	key: 'asol_key',
-	secret: 'asol',
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
-	}
-}));
 
 app.use(express.static(__dirname+'/static'));
 app.use("/static/login", function (request,response) {

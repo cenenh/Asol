@@ -15,15 +15,6 @@ login.use(bodyParser.urlencoded({
 })); // for parsing application/x-www-form-urlencoded
 login.use(multer()); // for parsing multipart/form-data
 login.use(express.Router());
-login.use(cookieParser('asol'));
-login.use(session({
-	key: 'asol_key',
-	resave: false,
-	saveUninitialized: true,
-	cookie: {
-		    maxAge: 1000 * 60 * 60 // 쿠키 유효기간 1시간
-	}
-}));
 
 login.use(function(request, response, next) {
 	console.log("/login middleware...");
