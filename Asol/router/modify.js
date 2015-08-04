@@ -21,10 +21,20 @@ modify.use(function(request, response, next) {
 
 modify.get('/', function(request, response) {
 	console.log("GET /modify is requested..");
+	var res = {
+		'responseCode' : 200,
+		'responseMessage' : 'GET /modify Success'
+	};
+	response.send(res)
 });
 
 modify.post('/', function(request, response) {
 	console.log("POST /modify is requested..");
+	var res = {
+		'responseCode' : 200,
+		'responseMessage' : 'POST /modify Success'
+	};
+	response.send(res)
 });
 
 module.exports = modify;

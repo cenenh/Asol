@@ -1,5 +1,7 @@
 var express = require("express");
-var ping = express.Router();
+var ping = express();
+
+ping.use(express.Router());
 
 ping.use(function(request,response,next){
 	console.log("/ping middleware...");
