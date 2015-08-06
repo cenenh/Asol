@@ -22,25 +22,21 @@ join.post('/' , function (request,response){
 	console.log("/join is requested..");
 	var body = request.body;
 	console.log(body)
+	
 	//encryption
 	var key = "asol";
 	var cipher = crypto.createCipher("aes128", key);
 	var encryptedPassword = cipher.update(body.password,"utf-8","hex");
 	encryptedPassword += cipher.final("hex");
 
-	// example) 1/208, 동/호수
-	var dong_ho = body.dong_ho;
-	var temp_arr = dong_ho.split("/");
-	var dong = temp_arr[0];
-	var ho = temp_arr[1];
 	//phone number parsing
 	var phone = parser.phoneParsing(body.phone)
 
 	var user = {
 			name : body.name,
 			phone : phone,
-			dong : dong,
-			ho : ho,
+			dong : body.dong,
+			ho : body.ho,
 			pw : encryptedPassword
 	}; //request로 받아온 user information 따와서 저장.
 
