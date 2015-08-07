@@ -22,16 +22,21 @@ imgs.use(function(request, response, next) {
 imgs.get('/', function(request, response){
 	console.log("GET /imgs is requested..")
 	fs.readdir(imageDir, function(err,files){
-		var res = [];
+		var res = {
+			fileName : []
+		};
 		var fileCount = files.length;
 		console.log("In server : " + files);
 		for(var i=0;i<fileCount;i++){
 			if(files[i].toLowerCase().match(".png") || files[i].toLowerCase().match(".jpg") || files[i].toLowerCase().match(".jpeg")){
-				res.push(files[i])
+				/*var res_json = {
+					fileName: files[i]
+				}
+				res.push(res_json)*/
+				res.fileName.push(files[i])
 			} // check extension
 		}	//for
 		console.log("will send arr : "+ res);
-		response.setHeader("Content-Type", "text/html");
 		response.send(res);
 	});//readdir
 });//get '/'
@@ -52,14 +57,12 @@ imgs.get('/:imgName', function(request, response){
 			});
 		} // if no err
 		else{
-			response.setHeader("Content-Type", "text/html");
 			response.send("no such file");
 		} // no such file
 	})
 });
 
 imgs.post('/', function(request, response){
-	response.setHeader("Content-Type", "text/html");
 	response.send("POST imgs")
 });
 

@@ -7,6 +7,7 @@ var fs = require('fs');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var path = require('path');
+var img_request = require('request');
 
 var upload = express();
 var imageDir = path.join(__dirname,'../imgs/');
@@ -68,7 +69,7 @@ upload.post('/', function(request, response) {
 			var output = [];
 			//__dirname + "/" + ".." + "/imgs/"
 			var imgDir = imageDir + request.files.image.originalname;
-			var newFileName = "asol_"+ user.unum + "_" + user.dong + "_" + user.ho + "_" + user.phone.substring(7) + "." + fileExtension;
+			var newFileName = "asol_"+ user.unum + "_" + user.dong + "_" + user.ho + "." + fileExtension;
 			var newImgDir = imageDir + newFileName;
 			console.log("it will be saved at : " + newImgDir);
 
@@ -81,6 +82,17 @@ upload.post('/', function(request, response) {
 								responseCode : 200,
 								responseMessage : "Upload OK!",
 								imageFileName : newFileName
+							});
+							var req_option={
+								uri: "http://127.0.0.1:3838/reqimgs",  //client에서 running중인 서버
+    						method: "GET"
+							};
+							img_request(req_option, function(error, res, body){ //client에서 running중인 서버에게 img request를 하라고 요청한다.
+								console.log("/request" + req_option.uri + " complete");
+								console.log(body);
+								if(error){
+									console.error(error);
+								}
 							});
 							response.send(output);
 						}
